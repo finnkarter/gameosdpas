@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape From Training - TEST</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            font-family: monospace;
+            text-align: center;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+        }
+        .title {
+            font-size: 2rem;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #d4af37;
+            color: #1a1a1a;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #ffd700;
+            transform: translateY(-2px);
+        }
+        .info {
+            margin: 20px 0;
+            padding: 20px;
+            background: #333;
+            border-radius: 5px;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #51cf66;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="title">🎖️ ESCAPE FROM TRAINING</div>
+        <div class="title">PMC Gun Evolution Simulator</div>
+        
+        <div class="info">
+            <h3>게임 실행 방법:</h3>
+            <p>이 게임은 ES6 모듈을 사용하므로 로컬 HTTP 서버가 필요합니다.</p>
+            
+            <h4>방법 1: 간단한 서버 실행</h4>
+            <p>1. 폴더에서 터미널/명령프롬프트 열기</p>
+            <p>2. 다음 중 하나 실행:</p>
+            <p><code>python -m http.server 8000</code></p>
+            <p><code>npx live-server</code></p>
+            <p><code>php -S localhost:8000</code></p>
+            
+            <h4>방법 2: VS Code Live Server</h4>
+            <p>VS Code에서 Live Server 확장 설치 후 index.html 우클릭 → "Open with Live Server"</p>
+        </div>
+        
+        <div class="info">
+            <h3>🎮 게임 특징:</h3>
+            <p>✅ 타르코프 스타일 UI</p>
+            <p>✅ 무기 진화 시스템</p>
+            <p>✅ 클리커 게임 메커니즘</p>
+            <p>✅ 성능 최적화</p>
+            <p>✅ 모듈화된 코드 구조</p>
+            <p>✅ 사운드 효과</p>
+            <p>✅ 자동 저장</p>
+        </div>
+        
+        <div class="info">
+            <h3>⌨️ 게임 조작법:</h3>
+            <p><strong>SPACE</strong> - 발사</p>
+            <p><strong>R</strong> - 재장전</p>
+            <p><strong>U</strong> - 업그레이드 패널</p>
+            <p><strong>M</strong> - 음소거</p>
+            <p><strong>P</strong> - 일시정지</p>
+            <p><strong>1/2/3</strong> - 사격장 변경</p>
+        </div>
+        
+        <div id="test-status" class="info">
+            <p>시스템 검사 중...</p>
+        </div>
+        
+        <a href="index.html" class="btn">🎖️ 게임 시작</a>
+        <a href="#" onclick="runTests()" class="btn">🔧 시스템 테스트</a>
+    </div>
+
+    <script>
+        function runTests() {
+            const status = document.getElementById('test-status');
+            let results = '<h3>시스템 검사 결과:</h3>';
+            
+            // ES6 모듈 지원 확인
+            if ('noModule' in HTMLScriptElement.prototype) {
+                results += '<p class="success">✅ ES6 모듈 지원됨</p>';
+            } else {
+                results += '<p class="error">❌ ES6 모듈 지원 안됨</p>';
+            }
+            
+            // 로컬 스토리지 확인
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                results += '<p class="success">✅ 로컬 스토리지 사용 가능</p>';
+            } catch (e) {
+                results += '<p class="error">❌ 로컬 스토리지 사용 불가</p>';
+            }
+            
+            // Web Audio API 확인
+            if (window.AudioContext || window.webkitAudioContext) {
+                results += '<p class="success">✅ Web Audio API 지원됨</p>';
+            } else {
+                results += '<p class="error">❌ Web Audio API 지원 안됨</p>';
+            }
+            
+            // Performance API 확인
+            if (window.performance && performance.now) {
+                results += '<p class="success">✅ Performance API 사용 가능</p>';
+            } else {
+                results += '<p class="error">❌ Performance API 사용 불가</p>';
+            }
+            
+            // 프로토콜 확인
+            if (location.protocol === 'file:') {
+                results += '<p class="error">⚠️ file:// 프로토콜 감지됨. HTTP 서버 필요!</p>';
+            } else {
+                results += '<p class="success">✅ HTTP 서버에서 실행 중</p>';
+            }
+            
+            status.innerHTML = results;
+        }
+        
+        // 페이지 로드 시 자동 테스트
+        window.onload = runTests;
+    </script>
+</body>
+</html>
