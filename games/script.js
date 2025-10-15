@@ -10,6 +10,7 @@ let wins = 0;
 let losses = 0;
 let draws = 0;
 let canDoubleDown = false;
+let maxCoins = 1000; // 최대 보유 코인 기록
 
 // 카드 정의
 const suits = ['♠', '♥', '♦', '♣'];
@@ -109,6 +110,11 @@ function updateDisplay() {
     }
 
     document.getElementById('coins').textContent = coins;
+    
+    // 최대 코인 업데이트
+    if (coins > maxCoins) {
+        maxCoins = coins;
+    }
 }
 
 function updateStats() {
@@ -348,6 +354,7 @@ function showGameOver() {
 // 게임 리셋
 function resetGame() {
     coins = 1000;
+    maxCoins = 1000;
     wins = 0;
     losses = 0;
     draws = 0;
@@ -364,7 +371,206 @@ function resetGame() {
     resetForNewRound();
 }
 
-// 초기화
-createDeck();
-updateStats();
+// ===== 리더보드 기능 =====
+
+// 리더보드 데이터 불러오기
+function getLeaderboard() {
+    const data = localStorage.getItem('blackjackLeaderboard');
+    return data ? JSON.parse(data) : [];
+}
+
+// 리더보드 데이터 저장하기
+function saveLeaderboardData(leaderboard) {
+    localStorage.setItem('blackjackLeaderboard', JSON.stringify(leaderboard));
+}
+
+// 리더보드 등록 모달 열기
+function showLeaderboardSave() {
+    const totalGames = wins + losses + draws;
+    const winRate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0;
+    
+    document.getElementById('save-total-games').textContent = totalGames;
+    document.getElementById('save-wins').textContent = wins;
+    document.getElementById('save-win-rate').textContent = winRate;
+    
+    document.getElementById('player-name-input').value = '';
+    document.getElementById('leaderboard-save-modal').classList.add('active');
+}
+
+// 리더보드 등록 모달 닫기
+function closeLeaderboardSave() {
+    document.getElementById('leaderboard-save-modal').classList.remove('active');
+}
+
+// 리더보드에 저장
+function saveToLeaderboard() {
+    const nameInput = document.getElementById('player-name-input');
+    const playerName = nameInput.value.trim();
+    
+    if (!playerName) {
+        alert('이름을 입력해주세요!');
+        nameInput.focus();
+        return;
+    }
+    
+    const totalGames = wins + losses + draws;
+    const winRate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0;
+    
+    const newEntry = {
+        name: playerName,
+        totalGames: totalGames,
+        wins: wins,
+        losses: losses,
+        draws: draws,
+        winRate: winRate,
+        maxCoins: maxCoins,
+        date: new Date().toISOString(),
+        timestamp: Date.now()
+    };
+    
+    let leaderboard = getLeaderboard();
+    leaderboard.push(newEntry);
+    
+    // 승률 기준으로 정렬 (승률이 같으면 총 게임 수 많은 순)
+    leaderboard.sort((a, b) => {
+        if (b.winRate !== a.winRate) {
+            return b.winRate - a.winRate;
+        }
+        return b.totalGames - a.totalGames;
+    });
+    
+    // 상위 50개만 유지
+    leaderboard = leaderboard.slice(0, 50);
+    
+    saveLeaderboardData(leaderboard);
+    
+    closeLeaderboardSave();
+    alert('리더보드에 등록되었습니다! 🎉');
+}
+
+// 리더보드 보기 모달 열기
+function showLeaderboard() {
+    displayLeaderboard();
+    document.getElementById('leaderboard-modal').classList.add('active');
+}
+
+// 리더보드 보기 모달 닫기
+function closeLeaderboard() {
+    document.getElementById('leaderboard-modal').classList.remove('active');
+}
+
+// 리더보드 표시
+function displayLeaderboard() {
+    const leaderboard = getLeaderboard();
+    const listDiv = document.getElementById('leaderboard-list');
+    
+    if (leaderboard.length === 0) {
+        listDiv.innerHTML = '<div class="leaderboard-empty">아직 등록된 기록이 없습니다.</div>';
+        return;
+    }
+    
+    listDiv.innerHTML = '';
+    
+    leaderboard.forEach((entry, index) => {
+        const rank = index + 1;
+        const date = new Date(entry.date);
+        const dateStr = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+        
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'leaderboard-item';
+        if (rank <= 3) {
+            itemDiv.classList.add(`rank-${rank}`);
+        }
+        
+        let rankIcon = rank;
+        if (rank === 1) rankIcon = '🥇';
+        else if (rank === 2) rankIcon = '🥈';
+        else if (rank === 3) rankIcon = '🥉';
+        
+        itemDiv.innerHTML = `
+            <div class="leaderboard-header">
+                <div class="leaderboard-rank">${rankIcon}</div>
+                <div class="leaderboard-name">${entry.name}</div>
+                <div class="leaderboard-date">${dateStr}</div>
+            </div>
+            <div class="leaderboard-stats">
+                <div class="leaderboard-stat">
+                    <div class="leaderboard-stat-label">승률</div>
+                    <div class="leaderboard-stat-value">${entry.winRate}%</div>
+                </div>
+                <div class="leaderboard-stat">
+                    <div class="leaderboard-stat-label">게임 수</div>
+                    <div class="leaderboard-stat-value">${entry.totalGames}</div>
+                </div>
+                <div class="leaderboard-stat">
+                    <div class="leaderboard-stat-label">승리</div>
+                    <div class="leaderboard-stat-value" style="color: #4caf50;">${entry.wins}</div>
+                </div>
+                <div class="leaderboard-stat">
+                    <div class="leaderboard-stat-label">패배</div>
+                    <div class="leaderboard-stat-value" style="color: #f44336;">${entry.losses}</div>
+                </div>
+                <div class="leaderboard-stat">
+                    <div class="leaderboard-stat-label">무승부</div>
+                    <div class="leaderboard-stat-value" style="color: #ffd700;">${entry.draws}</div>
+                </div>
+                <div class="leaderboard-stat">
+                    <div class="leaderboard-stat-label">최대 코인</div>
+                    <div class="leaderboard-stat-value" style="color: #4caf50;">${entry.maxCoins}</div>
+                </div>
+            </div>
+        `;
+        
+        listDiv.appendChild(itemDiv);
+    });
+}
+
+// 리더보드 초기화
+function clearLeaderboard() {
+    if (confirm('정말로 리더보드를 초기화하시겠습니까?\n모든 기록이 삭제됩니다!')) {
+        localStorage.removeItem('blackjackLeaderboard');
+        displayLeaderboard();
+        alert('리더보드가 초기화되었습니다.');
+    }
+}
+
+// 키보드 이벤트 처리
+document.addEventListener('keydown', function(e) {
+    // ESC 키로 모달 닫기
+    if (e.key === 'Escape') {
+        const saveModal = document.getElementById('leaderboard-save-modal');
+        const viewModal = document.getElementById('leaderboard-modal');
+        
+        if (saveModal.classList.contains('active')) {
+            closeLeaderboardSave();
+        } else if (viewModal.classList.contains('active')) {
+            closeLeaderboard();
+        }
+    }
+    
+    // 엔터 키로 리더보드 등록
+    if (e.key === 'Enter') {
+        const saveModal = document.getElementById('leaderboard-save-modal');
+        if (saveModal.classList.contains('active')) {
+            saveToLeaderboard();
+        }
+    }
+});
+
+// 모달 외부 클릭시 닫기
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        if (e.target.id === 'leaderboard-save-modal') {
+            closeLeaderboardSave();
+        } else if (e.target.id === 'leaderboard-modal') {
+            closeLeaderboard();
+        }
+    }
+});
+
+// 초기화 - DOM이 로드된 후 실행
+document.addEventListener('DOMContentLoaded', function() {
+    createDeck();
+    updateStats();
+});
 

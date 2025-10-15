@@ -8,6 +8,10 @@
 </head>
 <body>
     <div class="game-container">
+        <div style="text-align: right; margin-bottom: 10px;">
+            <button class="btn-leaderboard" onclick="showLeaderboard()">🏆 리더보드</button>
+        </div>
+        
         <h1>🎰 블랙잭 카지노 🎰</h1>
         
         <div class="game-info">
@@ -87,7 +91,46 @@
                 <p>무승부: <span id="final-draws">0</span></p>
                 <p>승률: <span id="win-rate">0</span>%</p>
             </div>
-            <button class="btn-deal" onclick="resetGame()" style="margin-top: 20px;">새로 시작</button>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button class="btn-leaderboard-save" onclick="showLeaderboardSave()">🏆 리더보드 등록</button>
+                <button class="btn-deal" onclick="resetGame()">새로 시작</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 리더보드 등록 모달 -->
+    <div class="modal-overlay" id="leaderboard-save-modal">
+        <div class="modal-content">
+            <div class="modal-title">🏆 리더보드 등록</div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; color: #e0e0e0;">당신의 기록을 리더보드에 등록하시겠습니까?</p>
+                <div class="game-over-stats" style="font-size: 1.1em; margin-bottom: 20px;">
+                    <p>총 게임 수: <span id="save-total-games">0</span></p>
+                    <p>승리: <span id="save-wins">0</span></p>
+                    <p>승률: <span id="save-win-rate">0</span>%</p>
+                </div>
+                <input type="text" id="player-name-input" class="name-input" placeholder="이름을 입력하세요" maxlength="15">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-deal" onclick="saveToLeaderboard()">등록</button>
+                <button class="btn-reset" onclick="closeLeaderboardSave()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 리더보드 보기 모달 -->
+    <div class="modal-overlay" id="leaderboard-modal">
+        <div class="modal-content leaderboard-large">
+            <div class="modal-title">🏆 리더보드 🏆</div>
+            <div class="modal-body">
+                <div id="leaderboard-list" class="leaderboard-list">
+                    <!-- 리더보드 내용이 여기에 표시됩니다 -->
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-reset" onclick="clearLeaderboard()">리더보드 초기화</button>
+                <button class="btn-deal" onclick="closeLeaderboard()">닫기</button>
+            </div>
         </div>
     </div>
 
