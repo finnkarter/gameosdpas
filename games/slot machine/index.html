@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>슬롯 머신 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎰 슬롯 머신 🎰</h1>
+        
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">크레딧:</span>
+                <span class="value" id="credits">1000</span>
+            </div>
+            <div class="info-item">
+                <span class="label">베팅:</span>
+                <span class="value" id="bet">10</span>
+            </div>
+            <div class="info-item">
+                <span class="label">승리:</span>
+                <span class="value" id="win">0</span>
+            </div>
+        </div>
+
+        <div class="slot-machine">
+            <div class="slot-container">
+                <div class="reel" id="reel1">
+                    <div class="symbol">🍒</div>
+                </div>
+                <div class="reel" id="reel2">
+                    <div class="symbol">🍒</div>
+                </div>
+                <div class="reel" id="reel3">
+                    <div class="symbol">🍒</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="message" id="message">행운을 빌어요!</div>
+
+        <div class="controls">
+            <div class="bet-controls">
+                <button class="btn btn-small" id="decreaseBet">-</button>
+                <span class="bet-label">베팅 조정</span>
+                <button class="btn btn-small" id="increaseBet">+</button>
+            </div>
+            <button class="btn btn-spin" id="spinBtn">SPIN</button>
+            <button class="btn btn-max" id="maxBet">MAX BET</button>
+        </div>
+
+        <div class="features-container">
+            <div class="auto-spin-section">
+                <h3>🎰 자동 스핀</h3>
+                <div class="auto-controls">
+                    <input type="number" id="autoSpinCount" min="5" max="100" step="5" value="10" placeholder="횟수">
+                    <button class="btn btn-auto" id="autoSpinBtn">자동 시작</button>
+                    <button class="btn btn-stop" id="stopAutoBtn" style="display:none;">정지</button>
+                </div>
+                <div class="auto-info" id="autoInfo"></div>
+            </div>
+
+            <div class="stats-section">
+                <h3>📊 게임 통계</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">총 게임:</span>
+                        <span class="stat-value" id="totalGames">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">승리:</span>
+                        <span class="stat-value" id="totalWins">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">승률:</span>
+                        <span class="stat-value" id="winRate">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">연속 승리:</span>
+                        <span class="stat-value" id="winStreak">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">최고 승리:</span>
+                        <span class="stat-value" id="biggestWin">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">잭팟 💰:</span>
+                        <span class="stat-value" id="jackpot">5000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <h3>📜 최근 기록</h3>
+                <div class="history-list" id="historyList">
+                    <div class="history-empty">아직 게임 기록이 없습니다</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="paytable">
+            <h3>배당표</h3>
+            <div class="pay-row highlight">
+                <span>7️⃣ 7️⃣ 7️⃣ (잭팟!)</span>
+                <span>JACKPOT</span>
+            </div>
+            <div class="pay-row">
+                <span>⭐ ⭐ ⭐</span>
+                <span>x20</span>
+            </div>
+            <div class="pay-row">
+                <span>🔔 🔔 🔔</span>
+                <span>x15</span>
+            </div>
+            <div class="pay-row">
+                <span>🍇 🍇 🍇</span>
+                <span>x12</span>
+            </div>
+            <div class="pay-row">
+                <span>🍊 🍊 🍊</span>
+                <span>x10</span>
+            </div>
+            <div class="pay-row">
+                <span>🍋 🍋 🍋</span>
+                <span>x8</span>
+            </div>
+            <div class="pay-row">
+                <span>🍒 🍒 🍒</span>
+                <span>x5</span>
+            </div>
+            <div class="pay-row">
+                <span>같은 심볼 2개</span>
+                <span>x1.5</span>
+            </div>
+            <div class="bonus-info">
+                💥 연속 승리 보너스: 3연승 +10%, 5연승 +25%, 10연승 +50%
+            </div>
+        </div>
+
+        <button class="btn btn-reset" id="resetBtn">게임 리셋</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
