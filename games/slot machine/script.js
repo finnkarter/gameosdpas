@@ -497,5 +497,5 @@ function resetGame() {
     autoSpinBtn.disabled = false;
 }
 
-// 게임 시작
-init();
+// 게임 시작 - DOM이 완전히 로드된 후에 실행
+document.addEventListener('DOMContentLoaded', init);

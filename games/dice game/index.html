@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주사위 게임</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 주사위 게임 🎲</h1>
+        
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">크레딧:</span>
+                <span class="value" id="credits">1000</span>
+            </div>
+            <div class="info-item">
+                <span class="label">베팅:</span>
+                <span class="value" id="bet">10</span>
+            </div>
+            <div class="info-item">
+                <span class="label">승리:</span>
+                <span class="value" id="win">0</span>
+            </div>
+        </div>
+
+        <div class="dice-container">
+            <div class="dice" id="dice1">
+                <div class="dice-face">
+                    <span class="dot"></span>
+                </div>
+            </div>
+            <div class="dice" id="dice2">
+                <div class="dice-face">
+                    <span class="dot"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-display">
+            <div class="total-sum" id="totalSum">합계: -</div>
+            <div class="dice-values" id="diceValues"></div>
+        </div>
+
+        <div class="message" id="message">베팅을 선택하고 주사위를 굴려보세요!</div>
+
+        <div class="betting-area">
+            <h3>베팅 선택</h3>
+            <div class="bet-options">
+                <button class="bet-option" data-type="low">
+                    <span class="bet-name">LOW</span>
+                    <span class="bet-range">2-6</span>
+                    <span class="bet-payout">x2</span>
+                </button>
+                <button class="bet-option" data-type="seven">
+                    <span class="bet-name">SEVEN</span>
+                    <span class="bet-range">7</span>
+                    <span class="bet-payout">x5</span>
+                </button>
+                <button class="bet-option" data-type="high">
+                    <span class="bet-name">HIGH</span>
+                    <span class="bet-range">8-12</span>
+                    <span class="bet-payout">x2</span>
+                </button>
+            </div>
+            <div class="bet-options-secondary">
+                <button class="bet-option" data-type="double">
+                    <span class="bet-name">더블</span>
+                    <span class="bet-range">같은 숫자</span>
+                    <span class="bet-payout">x10</span>
+                </button>
+                <button class="bet-option" data-type="odd">
+                    <span class="bet-name">홀수</span>
+                    <span class="bet-range">3,5,7,9,11</span>
+                    <span class="bet-payout">x2</span>
+                </button>
+                <button class="bet-option" data-type="even">
+                    <span class="bet-name">짝수</span>
+                    <span class="bet-range">2,4,6,8,10,12</span>
+                    <span class="bet-payout">x2</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="bet-controls">
+                <button class="btn btn-small" id="decreaseBet">-</button>
+                <span class="bet-label">베팅 조정</span>
+                <button class="btn btn-small" id="increaseBet">+</button>
+            </div>
+            <button class="btn btn-roll" id="rollBtn" disabled>주사위 굴리기</button>
+            <button class="btn btn-max" id="maxBet">MAX BET</button>
+        </div>
+
+        <div class="features-container">
+            <div class="stats-section">
+                <h3>📊 게임 통계</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">총 게임:</span>
+                        <span class="stat-value" id="totalGames">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">승리:</span>
+                        <span class="stat-value" id="totalWins">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">승률:</span>
+                        <span class="stat-value" id="winRate">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">연속 승리:</span>
+                        <span class="stat-value" id="winStreak">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">최고 승리:</span>
+                        <span class="stat-value" id="biggestWin">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">더블 횟수:</span>
+                        <span class="stat-value" id="doubleCount">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <h3>📜 최근 기록</h3>
+                <div class="history-list" id="historyList">
+                    <div class="history-empty">아직 게임 기록이 없습니다</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rules-section">
+            <h3>게임 규칙</h3>
+            <div class="rules-content">
+                <div class="rule-item">
+                    <strong>LOW (2-6):</strong> 주사위 합이 2~6이면 승리 (배당 x2)
+                </div>
+                <div class="rule-item">
+                    <strong>SEVEN (7):</strong> 주사위 합이 정확히 7이면 승리 (배당 x5)
+                </div>
+                <div class="rule-item">
+                    <strong>HIGH (8-12):</strong> 주사위 합이 8~12이면 승리 (배당 x2)
+                </div>
+                <div class="rule-item">
+                    <strong>더블:</strong> 두 주사위가 같은 숫자면 승리 (배당 x10)
+                </div>
+                <div class="rule-item">
+                    <strong>홀수/짝수:</strong> 주사위 합이 홀수 또는 짝수면 승리 (배당 x2)
+                </div>
+                <div class="rule-item bonus">
+                    <strong>💥 더블 보너스:</strong> 다른 베팅과 더블이 동시에 당첨되면 추가 보너스!
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-reset" id="resetBtn">게임 리셋</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
