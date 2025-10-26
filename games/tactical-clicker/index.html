@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactical Target Clicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 상단 HUD -->
+        <div class="hud">
+            <div class="hud-left">
+                <div class="stat-box">
+                    <span class="stat-label">레벨</span>
+                    <span id="level" class="stat-value">1</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">경험치</span>
+                    <div class="exp-bar">
+                        <div id="exp-fill" class="exp-fill"></div>
+                        <span id="exp-text" class="exp-text">0/100</span>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">루블</span>
+                    <span id="score" class="stat-value">₽0</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">명중률</span>
+                    <span id="accuracy" class="stat-value">100%</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">콤보</span>
+                    <span id="combo" class="stat-value combo-text">x0</span>
+                </div>
+            </div>
+            
+            <div class="hud-right">
+                <div class="weapon-info">
+                    <div id="weapon-name" class="weapon-name">Glock 17</div>
+                    <div class="ammo-counter">
+                        <span id="current-ammo">17</span>/<span id="reserve-ammo">34</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div id="game-area" class="game-area">
+            <div class="crosshair"></div>
+            <div id="targets-container"></div>
+        </div>
+
+        <!-- 하단 메뉴 -->
+        <div class="bottom-menu">
+            <button id="btn-weapons" class="menu-btn active">무기</button>
+            <button id="btn-attachments" class="menu-btn">부착물</button>
+            <button id="btn-skills" class="menu-btn">스킬</button>
+            <button id="btn-traders" class="menu-btn">상인</button>
+            <button id="btn-quests" class="menu-btn">퀘스트</button>
+            <button id="btn-stats" class="menu-btn">통계</button>
+        </div>
+
+        <!-- 무기 메뉴 -->
+        <div id="weapons-panel" class="panel active">
+            <h3>무기 선택</h3>
+            <div class="weapons-grid">
+                <!-- 권총 -->
+                <div class="weapon-card" data-weapon="glock17">
+                    <div class="weapon-card-header">Glock 17</div>
+                    <div class="weapon-stats">
+                        <div>데미지: 35</div>
+                        <div>RPM: 450</div>
+                        <div>정확도: 70%</div>
+                    </div>
+                    <div class="weapon-price">기본 무기</div>
+                </div>
+                
+                <div class="weapon-card locked" data-weapon="m1911">
+                    <div class="weapon-card-header">M1911</div>
+                    <div class="weapon-stats">
+                        <div>데미지: 50</div>
+                        <div>RPM: 400</div>
+                        <div>정확도: 75%</div>
+                    </div>
+                    <div class="weapon-price">₽5,000</div>
+                </div>
+
+                <!-- SMG -->
+                <div class="weapon-card locked" data-weapon="mp5">
+                    <div class="weapon-card-header">MP5</div>
+                    <div class="weapon-stats">
+                        <div>데미지: 30</div>
+                        <div>RPM: 800</div>
+                        <div>정확도: 75%</div>
+                    </div>
+                    <div class="weapon-price">₽15,000</div>
+                </div>
+
+                <!-- AR -->
+                <div class="weapon-card locked" data-weapon="m4a1">
+                    <div class="weapon-card-header">M4A1</div>
+                    <div class="weapon-stats">
+                        <div>데미지: 45</div>
+                        <div>RPM: 700</div>
+                        <div>정확도: 85%</div>
+                    </div>
+                    <div class="weapon-price">₽35,000</div>
+                </div>
+
+                <div class="weapon-card locked" data-weapon="ak74m">
+                    <div class="weapon-card-header">AK-74M</div>
+                    <div class="weapon-stats">
+                        <div>데미지: 55</div>
+                        <div>RPM: 650</div>
+                        <div>정확도: 80%</div>
+                    </div>
+                    <div class="weapon-price">₽40,000</div>
+                </div>
+
+                <!-- SR -->
+                <div class="weapon-card locked" data-weapon="svd">
+                    <div class="weapon-card-header">SVD</div>
+                    <div class="weapon-stats">
+                        <div>데미지: 85</div>
+                        <div>RPM: 300</div>
+                        <div>정확도: 95%</div>
+                    </div>
+                    <div class="weapon-price">₽80,000</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 부착물 메뉴 -->
+        <div id="attachments-panel" class="panel">
+            <h3>🔧 부착물</h3>
+            
+            <!-- 현재 장착된 부착물 -->
+            <div class="equipped-attachments">
+                <h4>장착된 부착물</h4>
+                <div class="equipped-slots">
+                    <div class="equipped-slot" data-type="optic">
+                        <div class="slot-icon">🔭</div>
+                        <div class="slot-info">
+                            <div class="slot-label">조준경</div>
+                            <div class="slot-value" id="equipped-optic">없음</div>
+                        </div>
+                        <button class="unequip-btn" data-type="optic">해제</button>
+                    </div>
+                    
+                    <div class="equipped-slot" data-type="muzzle">
+                        <div class="slot-icon">💨</div>
+                        <div class="slot-info">
+                            <div class="slot-label">총구</div>
+                            <div class="slot-value" id="equipped-muzzle">없음</div>
+                        </div>
+                        <button class="unequip-btn" data-type="muzzle">해제</button>
+                    </div>
+                    
+                    <div class="equipped-slot" data-type="grip">
+                        <div class="slot-icon">✊</div>
+                        <div class="slot-info">
+                            <div class="slot-label">손잡이</div>
+                            <div class="slot-value" id="equipped-grip">없음</div>
+                        </div>
+                        <button class="unequip-btn" data-type="grip">해제</button>
+                    </div>
+                    
+                    <div class="equipped-slot" data-type="stock">
+                        <div class="slot-icon">📏</div>
+                        <div class="slot-info">
+                            <div class="slot-label">개머리판</div>
+                            <div class="slot-value" id="equipped-stock">없음</div>
+                        </div>
+                        <button class="unequip-btn" data-type="stock">해제</button>
+                    </div>
+                    
+                    <div class="equipped-slot" data-type="magazine">
+                        <div class="slot-icon">📦</div>
+                        <div class="slot-info">
+                            <div class="slot-label">탄창</div>
+                            <div class="slot-value" id="equipped-magazine">없음</div>
+                        </div>
+                        <button class="unequip-btn" data-type="magazine">해제</button>
+                    </div>
+                </div>
+                
+                <!-- 총 스탯 -->
+                <div class="total-stats">
+                    <h4>총 보너스</h4>
+                    <div class="stats-row">
+                        <span class="stat-item">정확도: <span id="total-accuracy">+0</span></span>
+                        <span class="stat-item">반동: <span id="total-recoil">0</span></span>
+                        <span class="stat-item">에르고: <span id="total-ergo">+0</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 부착물 상점 -->
+            <div class="attachments-shop">
+                <h4>상점</h4>
+                
+                <div class="attachment-category">
+                    <h5>🔭 조준경 (Optics)</h5>
+                    <div class="attachments-grid">
+                        <div class="attachment-card locked" data-attachment="eotech553">
+                            <div class="attachment-name">EOTech 553</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">정확도 +5</span>
+                                <span class="stat-negative">에르고 -1</span>
+                            </div>
+                            <div class="attachment-price">₽8,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                        
+                        <div class="attachment-card locked" data-attachment="aimpoint">
+                            <div class="attachment-name">Aimpoint Micro T-1</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">정확도 +7</span>
+                            </div>
+                            <div class="attachment-price">₽12,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                        
+                        <div class="attachment-card locked" data-attachment="acog">
+                            <div class="attachment-name">Trijicon ACOG 4x</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">정확도 +15</span>
+                                <span class="stat-negative">에르고 -3</span>
+                            </div>
+                            <div class="attachment-price">₽25,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attachment-category">
+                    <h5>💨 총구 (Muzzle)</h5>
+                    <div class="attachments-grid">
+                        <div class="attachment-card locked" data-attachment="lantac">
+                            <div class="attachment-name">Lantac Dragon</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">반동 -10</span>
+                                <span class="stat-positive">정확도 +3</span>
+                            </div>
+                            <div class="attachment-price">₽6,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                        
+                        <div class="attachment-card locked" data-attachment="suppressor">
+                            <div class="attachment-name">Gemtech ONE</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">반동 -5</span>
+                                <span class="stat-special">스텔스 +20</span>
+                            </div>
+                            <div class="attachment-price">₽15,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attachment-category">
+                    <h5>✊ 손잡이 (Grip)</h5>
+                    <div class="attachments-grid">
+                        <div class="attachment-card locked" data-attachment="magpulafg">
+                            <div class="attachment-name">Magpul AFG</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">반동 -8</span>
+                                <span class="stat-positive">에르고 +5</span>
+                            </div>
+                            <div class="attachment-price">₽5,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                        
+                        <div class="attachment-card locked" data-attachment="rkgrip">
+                            <div class="attachment-name">Zenit RK-6</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">반동 -12</span>
+                                <span class="stat-positive">에르고 +2</span>
+                            </div>
+                            <div class="attachment-price">₽8,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attachment-category">
+                    <h5>📏 개머리판 (Stock)</h5>
+                    <div class="attachments-grid">
+                        <div class="attachment-card locked" data-attachment="magpulctr">
+                            <div class="attachment-name">Magpul CTR</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">반동 -5</span>
+                                <span class="stat-positive">에르고 +8</span>
+                            </div>
+                            <div class="attachment-price">₽7,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="attachment-category">
+                    <h5>📦 탄창 (Magazine)</h5>
+                    <div class="attachments-grid">
+                        <div class="attachment-card locked" data-attachment="extmag">
+                            <div class="attachment-name">확장 탄창</div>
+                            <div class="attachment-stats">
+                                <span class="stat-positive">탄창 +10</span>
+                                <span class="stat-negative">재장전 +5%</span>
+                            </div>
+                            <div class="attachment-price">₽10,000</div>
+                            <button class="attachment-btn">구매</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 스킬 메뉴 -->
+        <div id="skills-panel" class="panel">
+            <h3>PMC 스킬</h3>
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-name">🎯 정밀 사격</span>
+                        <span class="skill-level">Lv <span id="skill-accuracy-level">1</span></span>
+                    </div>
+                    <div class="skill-progress-bar">
+                        <div id="skill-accuracy-fill" class="skill-progress-fill"></div>
+                    </div>
+                    <div class="skill-desc">명중 시 정확도 +1% (현재: <span id="skill-accuracy-bonus">1</span>%)</div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-name">⚡ 빠른 손</span>
+                        <span class="skill-level">Lv <span id="skill-reload-level">1</span></span>
+                    </div>
+                    <div class="skill-progress-bar">
+                        <div id="skill-reload-fill" class="skill-progress-fill"></div>
+                    </div>
+                    <div class="skill-desc">재장전 시 속도 향상 (현재: <span id="skill-reload-bonus">0</span>%)</div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-name">💰 수색</span>
+                        <span class="skill-level">Lv <span id="skill-looting-level">1</span></span>
+                    </div>
+                    <div class="skill-progress-bar">
+                        <div id="skill-looting-fill" class="skill-progress-fill"></div>
+                    </div>
+                    <div class="skill-desc">루블 획득량 +2% (현재: <span id="skill-looting-bonus">0</span>%)</div>
+                </div>
+
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <span class="skill-name">🎖️ 전투 경험</span>
+                        <span class="skill-level">Lv <span id="skill-combat-level">1</span></span>
+                    </div>
+                    <div class="skill-progress-bar">
+                        <div id="skill-combat-fill" class="skill-progress-fill"></div>
+                    </div>
+                    <div class="skill-desc">경험치 획득량 +3% (현재: <span id="skill-combat-bonus">0</span>%)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상인 메뉴 -->
+        <div id="traders-panel" class="panel">
+            <h3>상인</h3>
+            <div class="traders-container">
+                <div class="trader-card">
+                    <div class="trader-header">
+                        <div class="trader-name">프라퍼 (Prapor)</div>
+                        <div class="trader-level">레벨 <span id="trader-prapor-level">1</span></div>
+                    </div>
+                    <div class="trader-rep">
+                        평판: <span id="trader-prapor-rep">0.00</span>
+                    </div>
+                    <div class="trader-progress-bar">
+                        <div id="trader-prapor-fill" class="trader-progress-fill"></div>
+                    </div>
+                    <div class="trader-desc">러시아 무기 전문 (다음 레벨: 5.00 평판)</div>
+                </div>
+
+                <div class="trader-card">
+                    <div class="trader-header">
+                        <div class="trader-name">스키어 (Skier)</div>
+                        <div class="trader-level">레벨 <span id="trader-skier-level">1</span></div>
+                    </div>
+                    <div class="trader-rep">
+                        평판: <span id="trader-skier-rep">0.00</span>
+                    </div>
+                    <div class="trader-progress-bar">
+                        <div id="trader-skier-fill" class="trader-progress-fill"></div>
+                    </div>
+                    <div class="trader-desc">부착물 전문 (다음 레벨: 5.00 평판)</div>
+                </div>
+
+                <div class="trader-card">
+                    <div class="trader-header">
+                        <div class="trader-name">피스키퍼 (Peacekeeper)</div>
+                        <div class="trader-level">레벨 <span id="trader-peacekeeper-level">1</span></div>
+                    </div>
+                    <div class="trader-rep">
+                        평판: <span id="trader-peacekeeper-rep">0.00</span>
+                    </div>
+                    <div class="trader-progress-bar">
+                        <div id="trader-peacekeeper-fill" class="trader-progress-fill"></div>
+                    </div>
+                    <div class="trader-desc">서방 무기 전문 (다음 레벨: 5.00 평판)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 퀘스트 메뉴 -->
+        <div id="quests-panel" class="panel">
+            <h3>📋 퀘스트</h3>
+            <div class="quests-container">
+                <div class="quest-card available" id="quest-1" data-quest="quest1">
+                    <div class="quest-status">🟢 수락 가능</div>
+                    <div class="quest-header">
+                        <span class="quest-name">사격 훈련 I</span>
+                        <span class="quest-giver">프라퍼</span>
+                    </div>
+                    <div class="quest-desc">타겟 20개 처치</div>
+                    <div class="quest-progress-container">
+                        <div class="quest-progress-bar">
+                            <div class="quest-progress-fill" id="quest-1-bar"></div>
+                        </div>
+                        <span class="quest-progress-text"><span id="quest-1-progress">0</span>/20</span>
+                    </div>
+                    <div class="quest-reward">
+                        <span class="reward-item">💰 ₽2,000</span>
+                        <span class="reward-item">⭐ 500 EXP</span>
+                        <span class="reward-item">🤝 프라퍼 +0.5</span>
+                    </div>
+                    <button class="quest-btn accept-btn" data-quest-action="accept">수락</button>
+                </div>
+
+                <div class="quest-card available" id="quest-2" data-quest="quest2">
+                    <div class="quest-status">🟢 수락 가능</div>
+                    <div class="quest-header">
+                        <span class="quest-name">정확한 사수</span>
+                        <span class="quest-giver">스키어</span>
+                    </div>
+                    <div class="quest-desc">명중률 80% 이상 달성</div>
+                    <div class="quest-progress-container">
+                        <div class="quest-progress-bar">
+                            <div class="quest-progress-fill" id="quest-2-bar"></div>
+                        </div>
+                        <span class="quest-progress-text"><span id="quest-2-progress">0</span>%</span>
+                    </div>
+                    <div class="quest-reward">
+                        <span class="reward-item">💰 ₽3,000</span>
+                        <span class="reward-item">⭐ 800 EXP</span>
+                        <span class="reward-item">🤝 스키어 +0.5</span>
+                    </div>
+                    <button class="quest-btn accept-btn" data-quest-action="accept">수락</button>
+                </div>
+
+                <div class="quest-card locked" id="quest-3" data-quest="quest3">
+                    <div class="quest-status">🔒 잠금</div>
+                    <div class="quest-header">
+                        <span class="quest-name">콤보 마스터</span>
+                        <span class="quest-giver">프라퍼</span>
+                    </div>
+                    <div class="quest-desc">10 콤보 달성</div>
+                    <div class="quest-progress-container">
+                        <div class="quest-progress-bar">
+                            <div class="quest-progress-fill" id="quest-3-bar"></div>
+                        </div>
+                        <span class="quest-progress-text">레벨 3 필요</span>
+                    </div>
+                    <div class="quest-reward">
+                        <span class="reward-item">💰 ₽5,000</span>
+                        <span class="reward-item">⭐ 1,200 EXP</span>
+                        <span class="reward-item">🤝 프라퍼 +1.0</span>
+                    </div>
+                    <button class="quest-btn locked-btn" disabled>잠금</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 통계 메뉴 -->
+        <div id="stats-panel" class="panel">
+            <h3>전투 통계</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-item-label">총 발사:</span>
+                    <span id="total-shots">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-item-label">명중:</span>
+                    <span id="total-hits">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-item-label">빗나감:</span>
+                    <span id="total-misses">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-item-label">최고 콤보:</span>
+                    <span id="best-combo">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-item-label">헤드샷:</span>
+                    <span id="total-headshots">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-item-label">획득 루블:</span>
+                    <span id="total-roubles">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 모듈 순서대로 로드 -->
+    <script src="modules/GameState.js"></script>
+    <script src="modules/SkillSystem.js"></script>
+    <script src="modules/TraderSystem.js"></script>
+    <script src="modules/QuestSystem.js"></script>
+    <script src="modules/WeaponSystem.js"></script>
+    <script src="modules/AttachmentSystem.js"></script>
+    <script src="modules/TargetSystem.js"></script>
+    <script src="modules/UIManager.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
