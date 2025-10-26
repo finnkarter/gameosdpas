@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Debugger</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">DEBUG MODE: ACTIVE</div>
+            <div class="difficulty-selector">
+                <button class="difficulty-btn" id="easyBtn">EASY</button>
+                <button class="difficulty-btn active" id="mediumBtn">MEDIUM</button>
+                <button class="difficulty-btn" id="hardBtn">HARD</button>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-label">Score:</span>
+                <span class="stat-value" id="score">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Combo:</span>
+                <span class="stat-value" id="combo">0</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Lives:</span>
+                <span class="stat-value" id="lives">5</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Level:</span>
+                <span class="stat-value" id="level">1</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Streak:</span>
+                <span class="stat-value" id="streak">0</span>
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill hp" id="hpBar" style="width: 100%"></div>
+            </div>
+            <div class="progress-bar" style="margin-top: 2px;">
+                <div class="progress-fill exp" id="expBar" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="combo-indicator" id="comboIndicator"></div>
+            <div class="streak-indicator" id="streakIndicator">Streak: 0</div>
+            
+            <div class="game-over-screen" id="gameOver">
+                <div class="game-over-title">DEBUG COMPLETE</div>
+                <div class="final-stats">
+                    Final Score: <span class="highlight" id="finalScore">0</span><br>
+                    Words Typed: <span class="highlight" id="finalWords">0</span> | 
+                    Accuracy: <span class="highlight" id="finalAccuracy">0</span>%<br>
+                    WPM: <span class="highlight" id="finalWPM">0</span> | 
+                    Max Combo: <span class="highlight" id="finalCombo">0</span><br>
+                    Level: <span class="highlight" id="finalLevel">1</span> | 
+                    Time: <span class="highlight" id="finalTime">0:00</span><br>
+                    <span id="newRecord" style="display: none; color: #ffd700;">🏆 NEW HIGH SCORE! 🏆</span>
+                </div>
+                <button class="restart-btn" onclick="startGame()">RESTART</button>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <div class="input-label">INPUT&gt;</div>
+            <input type="text" class="input-box" id="input" placeholder="Type words here..." autocomplete="off">
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 500px;
+            height: 220px;
+            background: #252526;
+            border: 1px solid #3e3e42;
+            padding: 8px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            background: #007acc;
+            color: white;
+            padding: 4px 8px;
+            margin-bottom: 6px;
+            font-size: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 15px;
+            font-size: 9px;
+        }
+        
+        .stat {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .stat-label {
+            color: #858585;
+        }
+        
+        .stat-value {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+        
+        .game-area {
+            height: 145px;
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            margin-bottom: 6px;
+            padding: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .word {
+            position: absolute;
+            color: #ce9178;
+            font-size: 13px;
+            font-weight: bold;
+            transition: top 0.05s linear;
+            white-space: nowrap;
+        }
+        
+        .word.typed {
+            color: #4ec9b0;
+        }
+        
+        .word.missed {
+            color: #f48771;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .input-label {
+            background: #0e639c;
+            color: white;
+            padding: 6px 8px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-box {
+            flex: 1;
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            color: #d4d4d4;
+            padding: 6px 8px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            outline: none;
+        }
+        
+        .input-box:focus {
+            border-color: #007acc;
+        }
+        
+        .game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(30, 30, 30, 0.95);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #d4d4d4;
+        }
+        
+        .game-over-screen.show {
+            display: flex;
+        }
+        
+        .game-over-title {
+            font-size: 18px;
+            color: #4ec9b0;
+            margin-bottom: 10px;
+        }
+        
+        .final-stats {
+            font-size: 11px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .restart-btn {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 11px;
+        }
+        
+        .restart-btn:hover {
+            background: #1177bb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>DEBUG MODE: ACTIVE</div>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Score:</span>
+                    <span class="stat-value" id="score">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Combo:</span>
+                    <span class="stat-value" id="combo">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Lives:</span>
+                    <span class="stat-value" id="lives">5</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="game-over-screen" id="gameOver">
+                <div class="game-over-title">DEBUG COMPLETE</div>
+                <div class="final-stats">
+                    Final Score: <span id="finalScore">0</span><br>
+                    Words Typed: <span id="wordsTyped">0</span><br>
+                    <span id="accuracy">0</span>
+                </div>
+                <button class="restart-btn" onclick="startGame()">RESTART</button>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <div class="input-label">INPUT&gt;</div>
+            <input type="text" class="input-box" id="input" placeholder="Type words here..." autocomplete="off">
+        </div>
+    </div>
+
+    <script>
+        const words = [
+            // 짧은 단어 (초급)
+            'if', 'else', 'for', 'while', 'return', 'const', 'let', 'var',
+            'int', 'bool', 'true', 'false', 'null', 'void', 'new', 'this',
+            // 중간 단어
+            'function', 'variable', 'array', 'object', 'string', 'number', 
+            'boolean', 'import', 'export', 'async', 'await', 'promise', 
+            'try', 'catch', 'break', 'continue', 'switch', 'case', 'default',
+            'typeof', 'instanceof', 'yield', 'static', 'extends', 'super',
+            // 긴 단어 (고급)
+            'constructor', 'prototype', 'interface', 'implements', 'namespace',
+            'debugger', 'setTimeout', 'setInterval', 'addEventListener'
+        ];
+
+        let game = {
+            score: 0,
+            combo: 0,
+            maxCombo: 0,
+            lives: 5,
+            activeWords: [],
+            wordId: 0,
+            gameActive: false,
+            wordsTyped: 0,
+            wordsMissed: 0,
+            totalCharacters: 0,
+            correctCharacters: 0,
+            spawnInterval: null,
+            moveInterval: null,
+            difficulty: 1,
+            spawnRate: 2000
+        };
+
+        const input = document.getElementById('input');
+        const gameArea = document.getElementById('gameArea');
+
+        // 게임 시작
+        function startGame() {
+            game = {
+                score: 0,
+                combo: 0,
+                maxCombo: 0,
+                lives: 5,
+                activeWords: [],
+                wordId: 0,
+                gameActive: true,
+                wordsTyped: 0,
+                wordsMissed: 0,
+                totalCharacters: 0,
+                correctCharacters: 0,
+                difficulty: 1,
+                spawnRate: 2000,
+                startTime: Date.now()
+            };
+
+            document.getElementById('gameOver').classList.remove('show');
+            gameArea.innerHTML = '';
+            input.value = '';
+            input.disabled = false;
+            input.focus();
+            updateDisplay();
+
+            // 단어 생성
+            game.spawnInterval = setInterval(spawnWord, game.spawnRate);
+            
+            // 단어 이동
+            game.moveInterval = setInterval(moveWords, 50);
+            
+            // 난이도 증가
+            setInterval(() => {
+                if (game.gameActive && game.difficulty < 2.5) {
+                    game.difficulty += 0.05;
+                    
+                    // 스폰 속도도 증가
+                    if (game.spawnRate > 1000) {
+                        game.spawnRate -= 50;
+                        clearInterval(game.spawnInterval);
+                        game.spawnInterval = setInterval(spawnWord, game.spawnRate);
+                    }
+                }
+            }, 10000);
+        }
+
+        // 단어 생성
+        function spawnWord() {
+            if (!game.gameActive) return;
+
+            const word = words[Math.floor(Math.random() * words.length)];
+            const wordEl = document.createElement('div');
+            wordEl.className = 'word';
+            wordEl.textContent = word;
+            wordEl.id = `word-${game.wordId}`;
+            wordEl.style.left = Math.random() * (gameArea.offsetWidth - 80) + 'px';
+            wordEl.style.top = '0px';
+
+            game.activeWords.push({
+                id: game.wordId,
+                text: word,
+                element: wordEl,
+                y: 0
+            });
+
+            gameArea.appendChild(wordEl);
+            game.wordId++;
+        }
+
+        // 단어 이동
+        function moveWords() {
+            if (!game.gameActive) return;
+
+            game.activeWords.forEach(word => {
+                word.y += 0.5 * game.difficulty;
+                word.element.style.top = word.y + 'px';
+
+                // 하단에 도달하면
+                if (word.y > gameArea.offsetHeight - 20) {
+                    removeWord(word.id, true);
+                    game.lives--;
+                    game.combo = 0;
+                    game.wordsMissed++;
+                    
+                    // 화면 흔들기 효과
+                    gameArea.style.animation = 'shake 0.3s';
+                    setTimeout(() => {
+                        gameArea.style.animation = '';
+                    }, 300);
+                    
+                    if (game.lives <= 0) {
+                        endGame();
+                    }
+                    
+                    updateDisplay();
+                }
+            });
+        }
+
+        // 흔들기 애니메이션 추가
+        const shakeStyle = document.createElement('style');
+        shakeStyle.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(shakeStyle);
+
+        // 단어 제거
+        function removeWord(id, missed = false) {
+            const index = game.activeWords.findIndex(w => w.id === id);
+            if (index !== -1) {
+                const word = game.activeWords[index];
+                
+                if (!missed) {
+                    word.element.classList.add('typed');
+                } else {
+                    word.element.classList.add('missed');
+                }
+                
+                setTimeout(() => {
+                    word.element.remove();
+                }, 200);
+                
+                game.activeWords.splice(index, 1);
+            }
+        }
+
+        // 입력 처리
+        input.addEventListener('input', (e) => {
+            const typed = e.target.value.trim().toLowerCase();
+            
+            if (typed === '') return;
+
+            // 부분 일치 하이라이트
+            game.activeWords.forEach(word => {
+                if (word.text.startsWith(typed)) {
+                    word.element.style.color = '#4ec9b0';
+                } else {
+                    word.element.style.color = '#ce9178';
+                }
+            });
+
+            // 완전 일치하는 단어 찾기
+            const match = game.activeWords.find(w => w.text === typed);
+            
+            if (match) {
+                // 점수 계산
+                const baseScore = match.text.length * 10;
+                const comboBonus = game.combo * 5;
+                const speedBonus = Math.floor((gameArea.offsetHeight - match.y) / 10);
+                const totalScore = baseScore + comboBonus + speedBonus;
+                
+                game.score += totalScore;
+                game.combo++;
+                game.maxCombo = Math.max(game.maxCombo, game.combo);
+                game.wordsTyped++;
+                game.correctCharacters += match.text.length;
+                
+                // 스코어 플로팅 텍스트
+                showFloatingScore(match.element, totalScore);
+                
+                removeWord(match.id, false);
+                input.value = '';
+                updateDisplay();
+            }
+        });
+
+        // 플로팅 스코어 표시
+        function showFloatingScore(element, score) {
+            const rect = element.getBoundingClientRect();
+            const floating = document.createElement('div');
+            floating.textContent = `+${score}`;
+            floating.style.position = 'fixed';
+            floating.style.left = rect.left + 'px';
+            floating.style.top = rect.top + 'px';
+            floating.style.color = '#4ec9b0';
+            floating.style.fontWeight = 'bold';
+            floating.style.fontSize = '14px';
+            floating.style.pointerEvents = 'none';
+            floating.style.zIndex = '1000';
+            floating.style.animation = 'floatUp 1s ease-out';
+            document.body.appendChild(floating);
+            
+            setTimeout(() => floating.remove(), 1000);
+        }
+
+        // CSS 애니메이션
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatUp {
+                0% { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-30px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 화면 업데이트
+        function updateDisplay() {
+            document.getElementById('score').textContent = game.score;
+            document.getElementById('combo').textContent = game.combo;
+            document.getElementById('lives').textContent = game.lives;
+        }
+
+        // 게임 종료
+        function endGame() {
+            game.gameActive = false;
+            clearInterval(game.spawnInterval);
+            clearInterval(game.moveInterval);
+            input.disabled = true;
+
+            const accuracy = game.wordsTyped + game.wordsMissed > 0 
+                ? Math.round((game.wordsTyped / (game.wordsTyped + game.wordsMissed)) * 100)
+                : 0;
+            
+            const wpm = game.wordsTyped > 0 
+                ? Math.round((game.correctCharacters / 5) / ((Date.now() - game.startTime) / 60000))
+                : 0;
+
+            document.getElementById('finalScore').textContent = game.score;
+            document.getElementById('wordsTyped').textContent = game.wordsTyped;
+            document.getElementById('accuracy').textContent = 
+                `${accuracy}% | Max Combo: ${game.maxCombo} | WPM: ${wpm}`;
+            document.getElementById('gameOver').classList.add('show');
+            
+            // 하이스코어 저장
+            const highScore = parseInt(localStorage.getItem('typingHighScore')) || 0;
+            if (game.score > highScore) {
+                localStorage.setItem('typingHighScore', game.score);
+            }
+        }
+
+        // 게임 시작
+        startGame();
+    </script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">2048</div>
+            <div class="score-container">
+                <div class="score-box">
+                    <div class="score-label">Score</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-label">Best</div>
+                    <div class="score-value" id="best">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="newGame">New Game</button>
+            <button class="btn" id="undoBtn">Undo (3)</button>
+            <button class="btn" id="hintBtn">💡 Hint</button>
+            <div class="info">Keys: ←↑→↓ or WASD | Z: Undo</div>
+        </div>
+        
+        <div class="grid-container" style="position: relative;">
+            <div class="grid" id="grid"></div>
+            
+            <div class="combo-display" id="comboDisplay"></div>
+            
+            <div class="move-indicator">
+                Moves: <span id="moves">0</span>
+            </div>
+            
+            <div class="game-over" id="gameOver">
+                <div class="game-over-text">Game Over!</div>
+                <div class="game-over-stats">
+                    Final Score: <span id="gameOverScore">0</span><br>
+                    Moves: <span id="gameOverMoves">0</span><br>
+                    Highest Tile: <span id="gameOverTile">0</span><br>
+                    Time: <span id="gameOverTime">0s</span><br>
+                    Efficiency: <span id="gameOverEfficiency">0</span> pts/move
+                </div>
+                <button class="btn" onclick="initGame()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #faf8ef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 500px;
+            height: 220px;
+            background: #bbada0;
+            border-radius: 6px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #776e65;
+        }
+        
+        .score-container {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .score-box {
+            background: #8f7a66;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 3px;
+            text-align: center;
+            min-width: 60px;
+        }
+        
+        .score-label {
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        
+        .score-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        
+        .btn {
+            background: #8f7a66;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            background: #9f8a76;
+        }
+        
+        .grid-container {
+            background: #bbada0;
+            border-radius: 4px;
+            padding: 4px;
+            flex: 1;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            height: 100%;
+        }
+        
+        .cell {
+            background: rgba(238, 228, 218, 0.35);
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #776e65;
+            transition: all 0.15s ease-in-out;
+        }
+        
+        .cell[data-value="2"] { background: #eee4da; color: #776e65; }
+        .cell[data-value="4"] { background: #ede0c8; color: #776e65; }
+        .cell[data-value="8"] { background: #f2b179; color: #f9f6f2; }
+        .cell[data-value="16"] { background: #f59563; color: #f9f6f2; }
+        .cell[data-value="32"] { background: #f67c5f; color: #f9f6f2; }
+        .cell[data-value="64"] { background: #f65e3b; color: #f9f6f2; }
+        .cell[data-value="128"] { background: #edcf72; color: #f9f6f2; font-size: 16px; }
+        .cell[data-value="256"] { background: #edcc61; color: #f9f6f2; font-size: 16px; }
+        .cell[data-value="512"] { background: #edc850; color: #f9f6f2; font-size: 16px; }
+        .cell[data-value="1024"] { background: #edc53f; color: #f9f6f2; font-size: 14px; }
+        .cell[data-value="2048"] { background: #edc22e; color: #f9f6f2; font-size: 14px; box-shadow: 0 0 15px rgba(237, 194, 46, 0.5); }
+        .cell[data-value="4096"] { background: #3c3a32; color: #f9f6f2; font-size: 14px; }
+        
+        .cell.new {
+            animation: appear 0.2s;
+        }
+        
+        .cell.merged {
+            animation: pop 0.2s;
+        }
+        
+        @keyframes appear {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(238, 228, 218, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 4px;
+        }
+        
+        .game-over.show {
+            display: flex;
+        }
+        
+        .game-over-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #776e65;
+            margin-bottom: 10px;
+        }
+        
+        .info {
+            font-size: 9px;
+            color: #776e65;
+            text-align: center;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">2048</div>
+            <div class="score-container">
+                <div class="score-box">
+                    <div class="score-label">Score</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="score-box">
+                    <div class="score-label">Best</div>
+                    <div class="score-value" id="best">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="newGame">New Game</button>
+            <button class="btn" id="undoBtn">Undo</button>
+            <div class="info">Use arrow keys: ←↑→↓</div>
+        </div>
+        
+        <div class="grid-container" style="position: relative;">
+            <div class="grid" id="grid"></div>
+            <div class="game-over" id="gameOver">
+                <div class="game-over-text">Game Over!</div>
+                <button class="btn" onclick="initGame()">Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let grid = [];
+        let score = 0;
+        let bestScore = 0;
+        let previousState = null;
+        const gridSize = 4;
+        let moveCount = 0;
+        let mergedCells = [];
+        let hasWon2048 = false;
+        let animating = false;
+
+        // 초기화
+        function initGame() {
+            grid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
+            score = 0;
+            moveCount = 0;
+            previousState = null;
+            hasWon2048 = false;
+            animating = false;
+            document.getElementById('gameOver').classList.remove('show');
+            addRandomTile();
+            addRandomTile();
+            updateDisplay();
+        }
+
+        // 랜덤 타일 추가
+        function addRandomTile() {
+            const emptyCells = [];
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (grid[i][j] === 0) {
+                        emptyCells.push({i, j});
+                    }
+                }
+            }
+            
+            if (emptyCells.length > 0) {
+                const {i, j} = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                grid[i][j] = Math.random() < 0.9 ? 2 : 4;
+                return {i, j};
+            }
+            return null;
+        }
+
+        // 그리드 회전
+        function rotateGrid(times) {
+            for (let t = 0; t < times; t++) {
+                const newGrid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
+                for (let i = 0; i < gridSize; i++) {
+                    for (let j = 0; j < gridSize; j++) {
+                        newGrid[j][gridSize - 1 - i] = grid[i][j];
+                    }
+                }
+                grid = newGrid;
+            }
+        }
+
+        // 왼쪽으로 이동 및 합치기
+        function moveLeft() {
+            let moved = false;
+            mergedCells = [];
+            
+            for (let i = 0; i < gridSize; i++) {
+                const row = grid[i].filter(val => val !== 0);
+                const newRow = [];
+                
+                for (let j = 0; j < row.length; j++) {
+                    if (j < row.length - 1 && row[j] === row[j + 1]) {
+                        const mergedValue = row[j] * 2;
+                        newRow.push(mergedValue);
+                        score += mergedValue;
+                        mergedCells.push({i, j: newRow.length - 1, value: mergedValue});
+                        j++;
+                        moved = true;
+                        
+                        // 2048 달성!
+                        if (mergedValue === 2048 && !hasWon2048) {
+                            hasWon2048 = true;
+                            setTimeout(() => {
+                                alert('🎉 You reached 2048! Keep going for a higher score!');
+                            }, 300);
+                        }
+                    } else {
+                        newRow.push(row[j]);
+                    }
+                }
+                
+                while (newRow.length < gridSize) {
+                    newRow.push(0);
+                }
+                
+                if (JSON.stringify(grid[i]) !== JSON.stringify(newRow)) {
+                    moved = true;
+                }
+                
+                grid[i] = newRow;
+            }
+            return moved;
+        }
+
+        // 이동
+        function move(direction) {
+            if (animating) return;
+            
+            previousState = {
+                grid: JSON.parse(JSON.stringify(grid)),
+                score: score,
+                moveCount: moveCount
+            };
+
+            const rotations = {
+                'left': 0,
+                'up': 1,
+                'right': 2,
+                'down': 3
+            };
+
+            const rotation = rotations[direction];
+            rotateGrid(rotation);
+            const moved = moveLeft();
+            rotateGrid(4 - rotation);
+
+            if (moved) {
+                moveCount++;
+                animating = true;
+                
+                setTimeout(() => {
+                    const newTile = addRandomTile();
+                    updateDisplay(newTile);
+                    animating = false;
+                    
+                    if (isGameOver()) {
+                        document.getElementById('gameOver').classList.add('show');
+                    }
+                }, 150);
+            }
+        }
+
+        // 게임 오버 체크
+        function isGameOver() {
+            // 빈 칸이 있으면 게임 계속
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    if (grid[i][j] === 0) return false;
+                }
+            }
+            
+            // 합칠 수 있는 타일이 있으면 게임 계속
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const current = grid[i][j];
+                    if ((j < gridSize - 1 && current === grid[i][j + 1]) ||
+                        (i < gridSize - 1 && current === grid[i + 1][j])) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        // 화면 업데이트
+        function updateDisplay(newTilePos = null) {
+            const gridEl = document.getElementById('grid');
+            gridEl.innerHTML = '';
+            
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    const value = grid[i][j];
+                    
+                    if (value !== 0) {
+                        cell.textContent = value;
+                        cell.setAttribute('data-value', value);
+                        
+                        // 새로 생성된 타일 애니메이션
+                        if (newTilePos && newTilePos.i === i && newTilePos.j === j) {
+                            cell.classList.add('new');
+                        }
+                        
+                        // 합쳐진 타일 애니메이션
+                        if (mergedCells.some(m => m.i === i && m.j === j)) {
+                            cell.classList.add('merged');
+                        }
+                    }
+                    gridEl.appendChild(cell);
+                }
+            }
+            
+            document.getElementById('score').textContent = score;
+            
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('2048Best', bestScore);
+            }
+            document.getElementById('best').textContent = bestScore;
+        }
+
+        // Undo 기능
+        function undo() {
+            if (previousState) {
+                grid = JSON.parse(JSON.stringify(previousState.grid));
+                score = previousState.score;
+                moveCount = previousState.moveCount;
+                previousState = null;
+                updateDisplay();
+            }
+        }
+
+        // 키보드 이벤트
+        document.addEventListener('keydown', (e) => {
+            const keyMap = {
+                'ArrowLeft': 'left',
+                'ArrowUp': 'up',
+                'ArrowRight': 'right',
+                'ArrowDown': 'down'
+            };
+            
+            if (keyMap[e.key]) {
+                e.preventDefault();
+                move(keyMap[e.key]);
+            }
+        });
+
+        // 터치 스와이프 지원
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            
+            if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+                move(dx > 0 ? 'right' : 'left');
+            } else if (Math.abs(dy) > 50) {
+                move(dy > 0 ? 'down' : 'up');
+            }
+        });
+
+        // 버튼 이벤트
+        document.getElementById('newGame').addEventListener('click', initGame);
+        document.getElementById('undoBtn').addEventListener('click', undo);
+
+        // 로컬 스토리지에서 베스트 스코어 불러오기
+        bestScore = parseInt(localStorage.getItem('2048Best')) || 0;
+
+        // 게임 시작
+        initGame();
+    </script>
+</body>
+</html>

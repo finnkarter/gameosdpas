@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">SYSTEM RESOURCE MONITOR v2.5.1</div>
+            <div class="header-actions">
+                <button class="mini-btn" id="statsBtn">📊</button>
+                <button class="mini-btn" id="settingsBtn">⚙️</button>
+                <button class="mini-btn" id="resetBtn">🔄</button>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Total Resources</div>
+                <div class="stat-value" id="points">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Per Second</div>
+                <div class="stat-value" id="rate">0.0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Total Clicks</div>
+                <div class="stat-value warning" id="totalClicks">0</div>
+            </div>
+        </div>
+        
+        <button class="main-btn" id="clickBtn">⚡ PROCESS MANUAL TASK [+1] ⚡</button>
+        
+        <div class="upgrades-header">
+            <span>AUTOMATED SYSTEMS</span>
+            <span style="color: #4ec9b0;">Right-click: Buy Max</span>
+        </div>
+        <div class="upgrades">
+            <button class="upgrade-btn" id="upgrade1">
+                <div class="upgrade-name">Auto-Script</div>
+                <div class="upgrade-cost">Cost: <span id="cost1">10</span></div>
+                <div class="upgrade-count">Own: <span id="count1">0</span></div>
+                <div class="upgrade-production">+<span id="prod1">0</span>/s</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade2">
+                <div class="upgrade-name">CPU Thread</div>
+                <div class="upgrade-cost">Cost: <span id="cost2">50</span></div>
+                <div class="upgrade-count">Own: <span id="count2">0</span></div>
+                <div class="upgrade-production">+<span id="prod2">0</span>/s</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade3">
+                <div class="upgrade-name">RAM Module</div>
+                <div class="upgrade-cost">Cost: <span id="cost3">200</span></div>
+                <div class="upgrade-count">Own: <span id="count3">0</span></div>
+                <div class="upgrade-production">+<span id="prod3">0</span>/s</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade4">
+                <div class="upgrade-name">GPU Core</div>
+                <div class="upgrade-cost">Cost: <span id="cost4">1000</span></div>
+                <div class="upgrade-count">Own: <span id="count4">0</span></div>
+                <div class="upgrade-production">+<span id="prod4">0</span>/s</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade5">
+                <div class="upgrade-name">Quantum AI</div>
+                <div class="upgrade-cost">Cost: <span id="cost5">5000</span></div>
+                <div class="upgrade-count">Own: <span id="count5">0</span></div>
+                <div class="upgrade-production">+<span id="prod5">0</span>/s</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade6">
+                <div class="upgrade-name">Datacenter</div>
+                <div class="upgrade-cost">Cost: <span id="cost6">25000</span></div>
+                <div class="upgrade-count">Own: <span id="count6">0</span></div>
+                <div class="upgrade-production">+<span id="prod6">0</span>/s</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade7">
+                <div class="upgrade-name">Server Farm</div>
+                <div class="upgrade-cost">Cost: <span id="cost7">100000</span></div>
+                <div class="upgrade-count">Own: <span id="count7">0</span></div>
+                <div class="upgrade-production">+<span id="prod7">0</span>/s</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade8">
+                <div class="upgrade-name">Supercomputer</div>
+                <div class="upgrade-cost">Cost: <span id="cost8">500000</span></div>
+                <div class="upgrade-count">Own: <span id="count8">0</span></div>
+                <div class="upgrade-production">+<span id="prod8">0</span>/s</div>
+            </button>
+        </div>
+        
+        <!-- 통계 패널 -->
+        <div class="stats-panel" id="statsPanel">
+            <div class="stats-grid">
+                <div class="stats-item">Play Time: <span id="statPlayTime">0s</span></div>
+                <div class="stats-item">Total Clicks: <span id="statTotalClicks">0</span></div>
+                <div class="stats-item">Total Earned: <span id="statTotalEarned">0</span></div>
+                <div class="stats-item">Golden Clicks: <span id="statGoldenClicks">0</span></div>
+                <div class="stats-item">Current CPS: <span id="cps">0</span></div>
+                <div class="stats-item">Achievements: <span id="statAchievements">0/10</span></div>
+            </div>
+        </div>
+        
+        <!-- 설정 패널 -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-item">
+                <label>
+                    <input type="checkbox" id="particlesToggle" checked>
+                    Particle Effects
+                </label>
+            </div>
+            <div class="settings-item">
+                <label>
+                    <input type="checkbox" id="notificationsToggle" checked>
+                    Notifications
+                </label>
+            </div>
+            <div class="settings-item">
+                <label>
+                    <input type="checkbox" id="autoSaveToggle" checked>
+                    Auto Save
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 500px;
+            height: 220px;
+            background: #2d2d30;
+            border: 1px solid #3e3e42;
+            padding: 8px;
+            font-size: 11px;
+        }
+        
+        .header {
+            background: #007acc;
+            color: white;
+            padding: 3px 6px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-box {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            padding: 4px 6px;
+        }
+        
+        .stat-label {
+            color: #858585;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        
+        .stat-value {
+            color: #4ec9b0;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        .main-btn {
+            width: 100%;
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            margin-bottom: 6px;
+            transition: background 0.1s;
+        }
+        
+        .main-btn:hover {
+            background: #1177bb;
+        }
+        
+        .main-btn:active {
+            background: #007acc;
+            transform: scale(0.98);
+        }
+        
+        .upgrades {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+        
+        .upgrade-btn {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            color: #d4d4d4;
+            padding: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            text-align: left;
+            transition: all 0.1s;
+        }
+        
+        .upgrade-btn:hover:not(:disabled) {
+            background: #2d2d30;
+            border-color: #007acc;
+        }
+        
+        .upgrade-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .upgrade-name {
+            color: #4ec9b0;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .upgrade-cost {
+            color: #ce9178;
+        }
+        
+        .upgrade-count {
+            color: #858585;
+            font-size: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">SYSTEM RESOURCE MONITOR v2.1.4</div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Total Resources</div>
+                <div class="stat-value" id="points">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Resources/sec</div>
+                <div class="stat-value" id="rate">0.0</div>
+            </div>
+        </div>
+        
+        <button class="main-btn" id="clickBtn">PROCESS MANUAL TASK [+1]</button>
+        
+        <div class="upgrades">
+            <button class="upgrade-btn" id="upgrade1">
+                <div class="upgrade-name">Auto-Script</div>
+                <div class="upgrade-cost">Cost: <span id="cost1">10</span></div>
+                <div class="upgrade-count">Owned: <span id="count1">0</span> (+0.1/s)</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade2">
+                <div class="upgrade-name">CPU Thread</div>
+                <div class="upgrade-cost">Cost: <span id="cost2">50</span></div>
+                <div class="upgrade-count">Owned: <span id="count2">0</span> (+0.5/s)</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade3">
+                <div class="upgrade-name">RAM Module</div>
+                <div class="upgrade-cost">Cost: <span id="cost3">200</span></div>
+                <div class="upgrade-count">Owned: <span id="count3">0</span> (+2/s)</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade4">
+                <div class="upgrade-name">GPU Core</div>
+                <div class="upgrade-cost">Cost: <span id="cost4">1000</span></div>
+                <div class="upgrade-count">Owned: <span id="count4">0</span> (+10/s)</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade5">
+                <div class="upgrade-name">Quantum AI</div>
+                <div class="upgrade-cost">Cost: <span id="cost5">5000</span></div>
+                <div class="upgrade-count">Owned: <span id="count5">0</span> (+50/s)</div>
+            </button>
+            
+            <button class="upgrade-btn" id="upgrade6">
+                <div class="upgrade-name">Datacenter</div>
+                <div class="upgrade-cost">Cost: <span id="cost6">25000</span></div>
+                <div class="upgrade-count">Owned: <span id="count6">0</span> (+250/s)</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const game = {
+            points: 0,
+            pointsPerClick: 1,
+            totalClicks: 0,
+            totalEarned: 0,
+            startTime: Date.now(),
+            clickPower: 1,
+            critChance: 0,
+            upgrades: [
+                { cost: 10, baseCost: 10, count: 0, rate: 0.1, name: 'Auto-Script' },
+                { cost: 50, baseCost: 50, count: 0, rate: 0.5, name: 'CPU Thread' },
+                { cost: 200, baseCost: 200, count: 0, rate: 2, name: 'RAM Module' },
+                { cost: 1000, baseCost: 1000, count: 0, rate: 10, name: 'GPU Core' },
+                { cost: 5000, baseCost: 5000, count: 0, rate: 50, name: 'Quantum AI' },
+                { cost: 25000, baseCost: 25000, count: 0, rate: 250, name: 'Datacenter' }
+            ],
+            achievements: {
+                firstClick: false,
+                hundredPoints: false,
+                thousandPoints: false,
+                firstUpgrade: false,
+                allUpgrades: false
+            }
+        };
+
+        // 요소 참조
+        const pointsEl = document.getElementById('points');
+        const rateEl = document.getElementById('rate');
+        const clickBtn = document.getElementById('clickBtn');
+
+        // 클릭 애니메이션 효과
+        function createFloatingText(x, y, text, isCrit = false) {
+            const floatingText = document.createElement('div');
+            floatingText.textContent = text;
+            floatingText.style.position = 'fixed';
+            floatingText.style.left = x + 'px';
+            floatingText.style.top = y + 'px';
+            floatingText.style.color = isCrit ? '#ffd700' : '#4ec9b0';
+            floatingText.style.fontWeight = 'bold';
+            floatingText.style.fontSize = isCrit ? '16px' : '12px';
+            floatingText.style.pointerEvents = 'none';
+            floatingText.style.zIndex = '1000';
+            floatingText.style.animation = 'floatUp 1s ease-out';
+            document.body.appendChild(floatingText);
+            
+            setTimeout(() => floatingText.remove(), 1000);
+        }
+
+        // 클릭 이벤트
+        clickBtn.addEventListener('click', (e) => {
+            game.totalClicks++;
+            
+            // 크리티컬 히트 체크 (5% 기본)
+            const isCrit = Math.random() < (0.05 + game.critChance);
+            const clickValue = isCrit ? game.pointsPerClick * 2 : game.pointsPerClick;
+            
+            game.points += clickValue;
+            game.totalEarned += clickValue;
+            
+            // 버튼 애니메이션
+            clickBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                clickBtn.style.transform = 'scale(1)';
+            }, 100);
+            
+            // 플로팅 텍스트
+            createFloatingText(e.clientX, e.clientY, 
+                isCrit ? `+${clickValue} CRIT!` : `+${clickValue}`, isCrit);
+            
+            checkAchievements();
+            updateDisplay();
+        });
+
+        // 업그레이드 구매
+        game.upgrades.forEach((upgrade, index) => {
+            const btn = document.getElementById(`upgrade${index + 1}`);
+            btn.addEventListener('click', (e) => {
+                if (game.points >= upgrade.cost) {
+                    game.points -= upgrade.cost;
+                    upgrade.count++;
+                    upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.15, upgrade.count));
+                    
+                    // 구매 효과음 (시각적)
+                    btn.style.background = '#4ec9b0';
+                    setTimeout(() => {
+                        btn.style.background = '';
+                    }, 200);
+                    
+                    // 첫 구매 도전과제
+                    if (!game.achievements.firstUpgrade) {
+                        game.achievements.firstUpgrade = true;
+                        showNotification('Achievement: First Upgrade!');
+                    }
+                    
+                    checkAchievements();
+                    updateDisplay();
+                }
+            });
+        });
+
+        // 자동 생산
+        setInterval(() => {
+            const totalRate = game.upgrades.reduce((sum, u) => sum + (u.count * u.rate), 0);
+            const earned = totalRate / 10; // 100ms마다 실행되므로 10으로 나눔
+            game.points += earned;
+            game.totalEarned += earned;
+            checkAchievements();
+            updateDisplay();
+        }, 100);
+
+        // 도전과제 체크
+        function checkAchievements() {
+            if (!game.achievements.firstClick && game.totalClicks >= 1) {
+                game.achievements.firstClick = true;
+                showNotification('Achievement: First Click!');
+            }
+            if (!game.achievements.hundredPoints && game.totalEarned >= 100) {
+                game.achievements.hundredPoints = true;
+                showNotification('Achievement: 100 Resources!');
+            }
+            if (!game.achievements.thousandPoints && game.totalEarned >= 1000) {
+                game.achievements.thousandPoints = true;
+                showNotification('Achievement: 1000 Resources!');
+            }
+            if (!game.achievements.allUpgrades && game.upgrades.every(u => u.count > 0)) {
+                game.achievements.allUpgrades = true;
+                showNotification('Achievement: Diversified!');
+            }
+        }
+
+        // 알림 표시
+        function showNotification(message) {
+            const notif = document.createElement('div');
+            notif.textContent = message;
+            notif.style.position = 'fixed';
+            notif.style.top = '10px';
+            notif.style.right = '10px';
+            notif.style.background = '#007acc';
+            notif.style.color = 'white';
+            notif.style.padding = '8px 12px';
+            notif.style.borderRadius = '4px';
+            notif.style.zIndex = '1000';
+            notif.style.animation = 'slideIn 0.3s ease-out';
+            document.body.appendChild(notif);
+            
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        // 화면 업데이트
+        function updateDisplay() {
+            pointsEl.textContent = Math.floor(game.points).toLocaleString();
+            
+            const totalRate = game.upgrades.reduce((sum, u) => sum + (u.count * u.rate), 0);
+            rateEl.textContent = totalRate.toFixed(1);
+
+            game.upgrades.forEach((upgrade, index) => {
+                const btn = document.getElementById(`upgrade${index + 1}`);
+                const costEl = document.getElementById(`cost${index + 1}`);
+                const countEl = document.getElementById(`count${index + 1}`);
+                
+                costEl.textContent = upgrade.cost.toLocaleString();
+                countEl.textContent = upgrade.count;
+                
+                btn.disabled = game.points < upgrade.cost;
+                
+                // 구매 가능할 때 하이라이트
+                if (game.points >= upgrade.cost) {
+                    btn.style.borderColor = '#007acc';
+                } else {
+                    btn.style.borderColor = '';
+                }
+            });
+        }
+
+        // 로컬 스토리지 저장/불러오기
+        function saveGame() {
+            const saveData = {
+                ...game,
+                lastSave: Date.now()
+            };
+            localStorage.setItem('miniClicker', JSON.stringify(saveData));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('miniClicker');
+            if (saved) {
+                const data = JSON.parse(saved);
+                game.points = data.points || 0;
+                game.upgrades = data.upgrades || game.upgrades;
+                game.totalClicks = data.totalClicks || 0;
+                game.totalEarned = data.totalEarned || 0;
+                game.achievements = data.achievements || game.achievements;
+                
+                // 오프라인 진행 계산
+                if (data.lastSave) {
+                    const offlineTime = (Date.now() - data.lastSave) / 1000; // 초 단위
+                    const totalRate = game.upgrades.reduce((sum, u) => sum + (u.count * u.rate), 0);
+                    const offlineEarnings = Math.floor(totalRate * offlineTime);
+                    
+                    if (offlineEarnings > 0) {
+                        game.points += offlineEarnings;
+                        showNotification(`Offline Earnings: +${offlineEarnings.toLocaleString()}`);
+                    }
+                }
+            }
+        }
+
+        // CSS 애니메이션 추가
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes floatUp {
+                0% { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-50px); }
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); }
+                to { transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 자동 저장
+        setInterval(saveGame, 5000);
+
+        // 게임 시작
+        loadGame();
+        updateDisplay();
+    </script>
+</body>
+</html>
